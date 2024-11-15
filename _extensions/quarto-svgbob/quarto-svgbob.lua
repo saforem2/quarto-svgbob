@@ -19,7 +19,7 @@ local renderer = {
 	end,
 	render_svgbob = function(text)
 		-- io.stderr:write("svgbob found: " .. text .. "\n")			
-		local params = {}
+		local params = {"--background none", "--fill-color none", "--stroke-color #838383"}
 		local cmd = { "svgbob_cli", params, text }
 		if not ProgramExists("svgbob_cli") then	-- svgbob_cli and svgbob allowed
 			cmd[1] = "svgbob"
