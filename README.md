@@ -3,6 +3,14 @@
 Render [svgbob](https://github.com/ivanceras/svgbob) diagrams directly in your [quarto](quarto.org/)
 documents.
 
+## Upstream changes
+
+- Modified `params` in the `render_svgbob` function from [quarto-svgbob.lua](_extensions/quarto-svgbob/quarto-svgbob.lua)
+
+  <img alt="light background" src="assets/light.png" width="50%"><img alt="dark background" src="assets/dark.png" width="50%">
+
+  Example from [samforeman.me/posts/svgbob](https://samforeman.me/posts/svgbob)
+
 ## Installing
 
 ```bash
