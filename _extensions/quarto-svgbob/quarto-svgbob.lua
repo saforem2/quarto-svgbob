@@ -18,10 +18,19 @@ local renderer = {
 		return data
 	end,
 	render_svgbob = function(text)
-		-- io.stderr:write("svgbob found: " .. text .. "\n")			
-		local params = {"--background none", "--fill-color none", "--stroke-color #838383"}
+		-- io.stderr:write("svgbob found: " .. text .. "\n")
+		local params = {
+			"--background",
+			"rgba(0,0,0,0.0)",
+			"--stroke-color",
+			"#838383",
+			"--fill-color",
+			"#838383",
+			-- "--font-family",
+			-- "IBM Plex Mono, monospace",
+		}
 		local cmd = { "svgbob_cli", params, text }
-		if not ProgramExists("svgbob_cli") then	-- svgbob_cli and svgbob allowed
+		if not ProgramExists("svgbob_cli") then -- svgbob_cli and svgbob allowed
 			cmd[1] = "svgbob"
 		end
 		local data = pandoc.pipe(cmd[1], cmd[2], cmd[3])
@@ -52,18 +61,18 @@ function InsertSvgLatex(svg_data)
 		os.mkdir("assets/")
 	end
 	local file_name = "assets/fig_" .. tostring(fig)
-	local file = io.open(file_name .. ".svg",'w')
+	local file = io.open(file_name .. ".svg", "w")
 	file:write(svg_data)
 	file:close()
-	pandoc.pipe("inkscape", { "--export-type=png", "--export-dpi=300", file_name  .. ".svg" }, "")
+	pandoc.pipe("inkscape", { "--export-type=png", "--export-dpi=300", file_name .. ".svg" }, "")
 	fig = fig + 1
-	return pandoc.Para({pandoc.Image({}, file_name  .. ".png")})
+	return pandoc.Para({ pandoc.Image({}, file_name .. ".png") })
 end
 
 function RenderCodeBlock(elem)
 	local data = Render(elem)
 	if data ~= nil then
-		if FORMAT:match 'latex' or FORMAT:match 'beamer' then
+		if FORMAT:match("latex") or FORMAT:match("beamer") then
 			return InsertSvgLatex(data)
 		else
 			return pandoc.Para({ pandoc.RawInline("html", data) })
@@ -72,7 +81,7 @@ function RenderCodeBlock(elem)
 		return nil
 	end
 end
- 
+
 function RenderCode(elem)
 	elem.text = elem.text:gsub("\\n.", "\n")
 	local data = Render(elem)
@@ -87,15 +96,15 @@ end
 -- https://github.com/mokeyish/obsidian-enhancing-export/blob/16cdb17ef673e822e03e6d270aa33b28079774cc/lua/polyfill.lua
 os.mkdir = function(dir)
 	if os.exists(dir) then
-	  return
+		return
 	end
 	if os.platform == "Windows" then
-	  dir = os.text.toencoding(dir)
-	  os.execute('mkdir "' .. dir .. '"')
+		dir = os.text.toencoding(dir)
+		os.execute('mkdir "' .. dir .. '"')
 	else
-	  os.execute('mkdir -p "' .. dir .. '"')
+		os.execute('mkdir -p "' .. dir .. '"')
 	end
-  end
+end
 
 -- Function taken from: github.com/mokeyish/obsidian-enhancing-export/lua/polyfill.lua
 -- https://github.com/mokeyish/obsidian-enhancing-export/blob/16cdb17ef673e822e03e6d270aa33b28079774cc/lua/polyfill.lua
@@ -112,21 +121,21 @@ os.exists = function(path)
 end
 
 function ProgramExists(program)
-    if os.platform == "Windows" then
-    	local data = os.execute("where " .. program)
+	if os.platform == "Windows" then
+		local data = os.execute("where " .. program)
 		if string.match(data, "Could not find") ~= nil then
 			return false
 		else
 			return true
 		end
-    else
-    	local data = os.execute("which " .. program .. " > /dev/null 2>&1")
+	else
+		local data = os.execute("which " .. program .. " > /dev/null 2>&1")
 		if data == nil then
 			return false
 		else
 			return true
 		end
-    end
+	end
 end
 
 return { { CodeBlock = RenderCodeBlock, Code = RenderCode } }
